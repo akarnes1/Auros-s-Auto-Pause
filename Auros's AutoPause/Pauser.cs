@@ -26,17 +26,6 @@ namespace AurosAutoPause
             }
         }
 
-        GamePauseManager _gamePauseManager;
-        GamePauseManager gamePauseManager
-        {
-            get
-            {
-                if (_gamePauseManager == null)
-                    _gamePauseManager = Resources.FindObjectsOfTypeAll<GamePauseManager>().FirstOrDefault();
-
-                return _gamePauseManager;
-            }
-        }
 
         StandardLevelGameplayManager _gamePlayManager;
         StandardLevelGameplayManager gamePlayManager
@@ -59,7 +48,7 @@ namespace AurosAutoPause
             updatePeriod = ModPrefs.GetFloat(name, "ResponseTime", updatePeriod, true);
 
             _playerController = Resources.FindObjectsOfTypeAll<PlayerController>().FirstOrDefault();
-            _gamePauseManager = Resources.FindObjectsOfTypeAll<GamePauseManager>().FirstOrDefault();
+            _gamePlayManager = Resources.FindObjectsOfTypeAll<StandardLevelGameplayManager>().FirstOrDefault();
             System.Console.WriteLine("[AutoPause] Pauser Awakened");
         }
 
@@ -99,7 +88,7 @@ namespace AurosAutoPause
 
                 //gamePauseManager.PauseGame();
                 //When the game is paused, saber position freezes. This if statement is to make sure that when the game is unpaused, it doesn't take the value which set off the tracking issue in the first place (if that makes any sense)
-                if (gamePauseManager != null && gamePauseManager.pause == true)
+                if (gamePlayManager != null && gamePlayManager.gameState == StandardLevelGameplayManager.GameState.Paused)
                 {
                     PreviousLeftSaberHandleLocation = LeftSaberHandleLocation;
                     PreviousRightSaberHandleLocation = RightSaberHandleLocation;
@@ -116,7 +105,7 @@ namespace AurosAutoPause
                     {
                         if (gamePlayManager != null)
                         {
-                            gamePlayManager.Pause();
+                            gamePlayManager.HandlePauseTriggered();
                             SoundPlayer DickMe = new SoundPlayer(Properties.Resources.fps);
                             DickMe.Play();
                             System.Console.WriteLine("[AutoPause] FPS Checker Has Just Been Activated");
@@ -128,8 +117,7 @@ namespace AurosAutoPause
                     {
                         if (gamePlayManager != null)
                         {
-                            gamePlayManager.Pause();
-                            gamePauseManager.PauseGame();
+                            gamePlayManager.HandlePauseTriggered();
                             SoundPlayer ReaxtsNerfGun = new SoundPlayer(Properties.Resources.tracking);
                             ReaxtsNerfGun.Play();
                             System.Console.WriteLine("[AutoPause] Tracking Detector Has Just Been Activated");
@@ -146,7 +134,7 @@ namespace AurosAutoPause
                     {
                         if (gamePlayManager != null)
                         {
-                            gamePlayManager.Pause();
+                            gamePlayManager.HandlePauseTriggered();
                             SoundPlayer ReaxtsNerfGun = new SoundPlayer(Properties.Resources.tracking);
                             ReaxtsNerfGun.Play();
                             System.Console.WriteLine("[AutoPause] Saber Fly Away Has Just Been Activated");
